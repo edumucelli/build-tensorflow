@@ -33,7 +33,7 @@ variable by one of the following:
 * 10.1.243
 
 Likewise, CuDNN version can be one of the following. Just replace the `CUDNN_PKG_VERSION`
-variable to the one you prefer.
+variable to the one you prefer. The packages come directly from [here](https://developer.download.nvidia.com/compute/machine-learning/repos/ubuntu1604/x86_64).
 
 * 7.0.1.13-1+cuda8.0
 * 7.0.2.38-1+cuda8.0
