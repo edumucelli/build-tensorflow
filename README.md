@@ -1,5 +1,7 @@
 # Build Tensorflow from source
 
+(You may want to see the already built [releases](https://github.com/edumucelli/build-tensorflow/releases) before building yourself)
+
 This project aims to build the Tensorflow from the source using a Dockerfile.
 The idea is to simplify the build so that one can choose the the Cuda/CuDNN
 version which better fits ones environment.
