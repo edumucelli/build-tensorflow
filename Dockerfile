@@ -88,26 +88,16 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Set up Bazel.
 
-# Running bazel inside a `docker build` command causes trouble, cf:
-#   https://github.com/bazelbuild/bazel/issues/134
-# The easiest solution is to set up a bazelrc file forcing --batch.
-RUN echo "startup --batch" >>/etc/bazel.bazelrc
-# Similarly, we need to workaround sandboxing issues:
-#   https://github.com/bazelbuild/bazel/issues/418
-RUN echo "build --spawn_strategy=standalone --genrule_strategy=standalone" >>/etc/bazel.bazelrc
-
 # Install bazel, version 0.16.0 can build tensorflow up to version 1.12,
 # but for version 1.13 onwards bazel >=0.19.0 is required.
-ENV BAZEL_VERSION 0.16.0
+ENV BAZEL_VERSION 0.19.2
 WORKDIR /
 RUN mkdir /bazel && \
-    cd /bazel && \
-    curl -H "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36" -fSsL -O https://github.com/bazelbuild/bazel/releases/download/$BAZEL_VERSION/bazel-$BAZEL_VERSION-installer-linux-x86_64.sh && \
-    curl -H "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36" -fSsL -o /bazel/LICENSE.txt https://raw.githubusercontent.com/bazelbuild/bazel/master/LICENSE && \
-    chmod +x bazel-*.sh && \
-    ./bazel-$BAZEL_VERSION-installer-linux-x86_64.sh && \
-    cd / && \
-    rm -f /bazel/bazel-$BAZEL_VERSION-installer-linux-x86_64.sh
+    wget -O /bazel/installer.sh "https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/bazel-${BAZEL_VERSION}-installer-linux-x86_64.sh" && \
+    wget -O /bazel/LICENSE.txt "https://raw.githubusercontent.com/bazelbuild/bazel/master/LICENSE" && \
+    chmod +x /bazel/installer.sh && \
+    /bazel/installer.sh && \
+rm -f /bazel/installer.sh
 
 # It is important to build with NCCL from an "agnostic" package, i.e., one that does not come from a specific distro,
 # cf: https://github.com/tensorflow/tensorflow/issues/20937#issuecomment-406382691
@@ -127,7 +117,7 @@ RUN pip3 install keras_preprocessing==1.0.2 --no-deps
 RUN pip3 install h5py==2.8.0
 
 # Download and build TensorFlow.
-ENV TENSORFLOW_GIT_BRANCH_VERSION r1.11
+ENV TENSORFLOW_GIT_BRANCH_VERSION r1.13
 WORKDIR /tensorflow
 RUN git clone --branch=$TENSORFLOW_GIT_BRANCH_VERSION --depth=1 https://github.com/tensorflow/tensorflow.git .
 
@@ -163,6 +153,8 @@ ENV TMP="/tmp"
 # To workaround an issue on python3-only environment, cf: https://github.com/tensorflow/tensorflow/pull/19443 and
 # https://github.com/tensorflow/tensorflow/issues/15618
 RUN ln -s -f /usr/bin/python3 /usr/bin/python
+
+# RUN echo "import /tensorflow/tools/bazel.rc" >> /tensorflow/.bazelrc
 
 RUN ln -s /usr/local/cuda/lib64/stubs/libcuda.so /usr/local/cuda/lib64/stubs/libcuda.so.1 && \
     LD_LIBRARY_PATH=/usr/local/cuda/lib64/stubs:${LD_LIBRARY_PATH} \
