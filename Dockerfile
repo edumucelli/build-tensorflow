@@ -37,7 +37,8 @@ ENV NVIDIA_DRIVER_CAPABILITIES compute,utility
 ENV NVIDIA_REQUIRE_CUDA "cuda>=9.1"
 
 # == tensorflow-gpu: tensorflow + cuda and cudnn build with bazel based on the official Dockerfile
-# cf: https://github.com/tensorflow/tensorflow/blob/master/tensorflow/tools/docker/Dockerfile.devel-gpu
+# cf until 1.12.3: https://github.com/tensorflow/tensorflow/blob/v1.12.3/tensorflow/tools/docker/Dockerfile.devel-gpu
+# or master https://github.com/tensorflow/tensorflow/blob/master/tensorflow/tools/dockerfiles/dockerfiles/devel-gpu.Dockerfile
 # The difference here is that no jupyter, keras, etc are needed, the goal here is tha bare minimum
 # in order to build the tensorflow-gpu with python3.5, cuda 9.1.85 and cudnn 7.1.3
 
@@ -112,12 +113,20 @@ RUN mkdir /bazel && \
 # I have downloaded it from Nvidia on https://developer.nvidia.com/nccl/nccl-legacy-downloads
 # and stored it on a personal Dropbox folder.
 RUN mkdir -p /usr/local/nccl2
+# Or "https://www.dropbox.com/s/f3r9tkg6wk29pw8/nccl_2.1.15-1+cuda9.1_x86_64.txz" for Cuda 9.2
 RUN wget "https://www.dropbox.com/s/f3r9tkg6wk29pw8/nccl_2.1.15-1+cuda9.1_x86_64.txz"
 RUN tar -xvf nccl_2.1.15-1+cuda9.1_x86_64.txz --directory /usr/local/nccl2 --strip-components=1
 
+# https://github.com/tensorflow/tensorflow/issues/21518
+# https://stackoverflow.com/a/51774943/914874
+RUN pip3 install keras_applications==1.0.4 --no-deps
+RUN pip3 install keras_preprocessing==1.0.2 --no-deps
+RUN pip3 install h5py==2.8.0
+
 # Download and build TensorFlow.
+ENV TENSORFLOW_GIT_BRANCH_VERSION r1.11
 WORKDIR /tensorflow
-RUN git clone --branch=r1.7 --depth=1 https://github.com/tensorflow/tensorflow.git .
+RUN git clone --branch=$TENSORFLOW_GIT_BRANCH_VERSION --depth=1 https://github.com/tensorflow/tensorflow.git .
 
 # Configure the build for our CUDA configuration.
 ENV TF_NCCL_VERSION='2.1.15'
