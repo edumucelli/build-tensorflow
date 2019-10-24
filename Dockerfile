@@ -117,6 +117,7 @@ RUN mkdir -p /usr/local/nccl2
 RUN wget "https://www.dropbox.com/s/f3r9tkg6wk29pw8/nccl_2.1.15-1+cuda9.1_x86_64.txz"
 RUN tar -xvf nccl_2.1.15-1+cuda9.1_x86_64.txz --directory /usr/local/nccl2 --strip-components=1
 
+# These packages are required from tensorflow 1.11 onwards
 # https://github.com/tensorflow/tensorflow/issues/21518
 # https://stackoverflow.com/a/51774943/914874
 RUN pip3 install keras_applications==1.0.4 --no-deps
