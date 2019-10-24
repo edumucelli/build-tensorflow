@@ -95,8 +95,10 @@ RUN echo "startup --batch" >>/etc/bazel.bazelrc
 # Similarly, we need to workaround sandboxing issues:
 #   https://github.com/bazelbuild/bazel/issues/418
 RUN echo "build --spawn_strategy=standalone --genrule_strategy=standalone" >>/etc/bazel.bazelrc
-# Install bazel
-ENV BAZEL_VERSION 0.16.0
+
+# Install bazel, version 0.16.0 can build tensorflow up to version 1.12,
+# but for version 1.13 onwards bazel >=0.19.0 is required.
+ENV BAZEL_VERSION 0.19.0
 WORKDIR /
 RUN mkdir /bazel && \
     cd /bazel && \
