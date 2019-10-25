@@ -157,8 +157,9 @@ RUN ln -s -f /usr/bin/python3 /usr/bin/python
 
 # RUN echo "import /tensorflow/tools/bazel.rc" >> /tensorflow/.bazelrc
 
-ENV LD_LIBRARY_PATH /usr/local/cuda/lib64/stubs:${LD_LIBRARY_PATH}
-RUN ln -s /usr/local/cuda/lib64/stubs/libcuda.so /usr/local/cuda/lib64/stubs/libcuda.so.1 && \
+ENV LD_LIBRARY_PATH /usr/local/cuda/extras/CUPTI/lib64:$LD_LIBRARY_PATH
+RUN ln -s /usr/local/cuda/lib64/stubs/libcuda.so /usr/local/cuda/lib64/stubs/libcuda.so.1 &&
+    LD_LIBRARY_PATH=/usr/local/cuda/lib64/stubs:${LD_LIBRARY_PATH} \
     tensorflow/tools/ci_build/builds/configured GPU \
     bazel build -c opt --copt=-mavx --copt=-mavx2 --copt=-mfma --copt=-mfpmath=both --copt=-msse4.1 --copt=-msse4.2 --config=cuda \
     --cxxopt="-D_GLIBCXX_USE_CXX11_ABI=0" \
