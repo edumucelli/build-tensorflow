@@ -89,8 +89,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Set up Bazel.
 
 # Install bazel, version 0.16.0 can build tensorflow up to version 1.12,
-# but for version 1.13 onwards bazel >=0.19.0 is required.
-ENV BAZEL_VERSION 0.19.2
+# but for version 1.13 onwards bazel >=0.19.0 is required,
+# and for version 1.14 onwards bazel >= 0.24.1 is required.
+ENV BAZEL_VERSION 0.24.1
 WORKDIR /
 RUN mkdir /bazel && \
     wget -O /bazel/installer.sh "https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/bazel-${BAZEL_VERSION}-installer-linux-x86_64.sh" && \
@@ -156,8 +157,8 @@ RUN ln -s -f /usr/bin/python3 /usr/bin/python
 
 # RUN echo "import /tensorflow/tools/bazel.rc" >> /tensorflow/.bazelrc
 
+ENV LD_LIBRARY_PATH /usr/local/cuda/lib64/stubs:${LD_LIBRARY_PATH}
 RUN ln -s /usr/local/cuda/lib64/stubs/libcuda.so /usr/local/cuda/lib64/stubs/libcuda.so.1 && \
-    LD_LIBRARY_PATH=/usr/local/cuda/lib64/stubs:${LD_LIBRARY_PATH} \
     tensorflow/tools/ci_build/builds/configured GPU \
     bazel build -c opt --copt=-mavx --copt=-mavx2 --copt=-mfma --copt=-mfpmath=both --copt=-msse4.1 --copt=-msse4.2 --config=cuda \
     --cxxopt="-D_GLIBCXX_USE_CXX11_ABI=0" \
