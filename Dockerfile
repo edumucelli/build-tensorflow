@@ -117,7 +117,7 @@ RUN pip3 install keras_preprocessing==1.0.2 --no-deps
 RUN pip3 install h5py==2.8.0
 
 # Download and build TensorFlow.
-ENV TENSORFLOW_GIT_BRANCH_VERSION r1.13
+ENV TENSORFLOW_GIT_BRANCH_VERSION r1.14
 WORKDIR /tensorflow
 RUN git clone --branch=$TENSORFLOW_GIT_BRANCH_VERSION --depth=1 https://github.com/tensorflow/tensorflow.git .
 
