@@ -91,7 +91,7 @@ ENV TF_NEED_GCP=0 \
 RUN ln -s -f /usr/bin/python3 /usr/bin/python
 
 RUN tensorflow/tools/ci_build/builds/configured CPU \
-    bazel build -c opt \
+    bazel build --config=mkl -c opt \
         --copt=-mavx \
         --copt=-mavx2 \
         --copt=-mfma \
